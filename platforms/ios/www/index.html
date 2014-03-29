@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Ring ToneApp</title>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+        <script src="phonegap.js"></script>
+        <script src="jquery.js"></script>
+        <script src="js/bootstrap.js"></script>
+        <script>
+            document.addEventListener("deviceready",function(){
+                $(function(){
+                    $.ajax({
+                        type: "POST",
+                        url: "http://carlos.igitsoft.com/apps/ringtonesPlatform/servApp.php",
+                        data: { pet: "0" },
+                        dataType: "json"
+                    })
+                    .done(function( msg ) {
+                        //msg = JSON.parse(msg);
+                        for(i=0;i<msg.length;i++){
+                            $('#listaCanciones').append('<div class="list-group-item row"><a class="btn btn-default btn-lg col-xs-3 play"><span class="glyphicon glyphicon-play"></span><audio><source src="'+msg[i].ruta+'" type="audio/mpeg"></audio></a><div class="col-xs-6"><h4 class="list-group-item-heading">'+msg[i].nombre+'</h4></div><a class="btn btn-info btn-lg col-xs-3 download"><span class="glyphicon glyphicon-cloud-download"></span></a></div>');
+                        }
+                        $('#listaCanciones div a.play').click(function(){
+                            var audio = $(this).find('audio');
+                            audio[0].play();
+                        });
+                        $('#listaCanciones div a.download').click(function(){
+                            var padre = $(this).parent('div');
+                            var url = padre.find('.play audio source').attr('src');
+                            var nom = padre.find('h4').text();
+                            downloadFile(url,nom)
+                        });
+                    });
+                    
+                    function downloadFile(arc,nom){
+
+                        /*window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,function onFileSystemSuccess(fileSystem){
+                            fileSystem.root.getFile("dummy.html", {create: true, exclusive: false},function gotFileEntry(fileEntry){
+                                var sPath = fileEntry.fullPath.replace("dummy.html","");
+                                alert(sPath);
+                                var fileTransfer = new FileTransfer();
+                                fileEntry.remove();
+                        
+                                fileTransfer.download(arc,sPath + nom + ".mp3",function(theFile){
+                                    console.log("download complete: " + theFile.toURI());
+                                    showLink(theFile.toURI());
+                                },function(error){
+                                    console.log("download error source " + error.source);
+                                    console.log("download error target " + error.target);
+                                    console.log("upload error code: " + error.code);
+                                });
+                            }, fail);
+                        }, fail);*/
+                        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
+                            fileSystem.root.getDirectory("ringToneApp", {create: true, exclusive: false}, function(dirEntry){
+                                var dir = dirEntry.fullPath;
+                                alert(arc+nom);
+                            }, function(){
+                                alert('error');
+                            });
+    }, fail);
+                        
+                    }
+                    function fail(error) {
+                        console.log(error.code);
+                    }
+                });
+            },false);
+            /*$(function(){
+                $('#listaCanciones div a.play').click(function(){
+                    var audio = $(this).find('audio');
+                    audio[0].play();
+                });
+                $('#listaCanciones div a.download').click(function(){
+                    var padre = $(this).parent('div');
+                    var url = padre.find('.play audio source').attr('src');
+                    alert(url);
+                });
+            });*/
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">RingTone App</a>
+                </div>
+            </div>
+        </nav>
+        <div class="list-group container-fluid" id="listaCanciones"></div>
+    </body>
+</html>
